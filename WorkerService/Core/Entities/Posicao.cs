@@ -27,4 +27,16 @@ public sealed class Posicao
         PrecoMedio = novoPrecoMedio;
         PL = novoPL;
     }
+
+    public void AtualizarPLComNovaCotacao(decimal novoPrecoUnitarioAtivo)
+    {
+        if (this.Quantidade > 0)
+        {
+            this.PL = (this.Quantidade * novoPrecoUnitarioAtivo) - (this.Quantidade * this.PrecoMedio);
+        }
+        else
+        {
+            this.PL = 0;
+        }
+    }
 }
