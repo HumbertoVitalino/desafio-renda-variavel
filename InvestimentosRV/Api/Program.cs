@@ -1,12 +1,15 @@
+using Api.Extensions;
 using Core.IoC;
 using Infra.IoC;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+builder.AddSerilogApi();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwagger();
 
 builder.Services.AddJwt(configuration);
 builder.Services.AddMediatr(configuration);
@@ -21,6 +24,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseSerilogRequestLogging();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
