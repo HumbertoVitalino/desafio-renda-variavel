@@ -1,9 +1,9 @@
-﻿using Core.Boundaries.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Core.Behaviors;
+using Core.UseCase.NewUserUseCase;
+using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace Core.IoC;
 
@@ -13,37 +13,12 @@ public static class DependencyInjection
     {
         services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
+        cfg.RegisterServicesFromAssembly(typeof(NewUser).Assembly);
         });
 
-        return services;
-    }
-
-    public static IServiceCollection AddJwt(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddSingleton<JwtTokenProvider>();
-
-        var secretKey = configuration["Jwt:Secret"];
-        var key = Encoding.ASCII.GetBytes(secretKey);
-
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.RequireHttpsMetadata = false;
-            options.SaveToken = true;
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = false,
-                ValidateAudience = false
-            };
-        });
+        services.AddValidatorsFromAssembly(typeof(NewUser).Assembly);
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
 
         return services;
-    }
+    }   
 }
