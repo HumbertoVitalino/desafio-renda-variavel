@@ -29,6 +29,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(e => e.PasswordHash).HasColumnName("senha_hash").IsRequired();
             entity.Property(e => e.PasswordSalt).HasColumnName("senha_salt").IsRequired();
             entity.Property(e => e.BrokerageRate).HasColumnName("taxa_corretagem").HasColumnType("decimal(5, 4)").IsRequired();
+            entity.Property(e => e.Profile).HasColumnName("perfil_investidor").IsRequired();
 
             entity.HasIndex(e => e.Email).IsUnique();
 
@@ -47,6 +48,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
             entity.Property(e => e.TickerSymbol).HasColumnName("codigo_ativo").IsRequired().HasMaxLength(10);
             entity.Property(e => e.Name).HasColumnName("nome_ativo").IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Risk).HasColumnName("risco_ativo").IsRequired();
 
             entity.HasIndex(e => e.TickerSymbol).IsUnique();
 
