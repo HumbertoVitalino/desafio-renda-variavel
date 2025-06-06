@@ -26,6 +26,10 @@ public static class DependencyInjection
         serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
         serviceCollection.AddScoped<IUserRepository, UserRepository>();
         serviceCollection.AddScoped<IPasswordService, PasswordService>();
+        serviceCollection.AddScoped<IQuoteRepository, QuoteRepository>();
+        serviceCollection.AddScoped<IPositionRepository, PositionRepositoy>();
+        serviceCollection.AddScoped<IAssetRepository, AssetRepository>();
+        serviceCollection.AddScoped<IOperationRepository, OperationRepository>();
 
         return serviceCollection;
     }
