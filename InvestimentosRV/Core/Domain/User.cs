@@ -1,4 +1,6 @@
-﻿namespace Core.Domain;
+﻿using Core.Domain.Enums;
+
+namespace Core.Domain;
 
 public class User : Entity
 {
@@ -7,6 +9,7 @@ public class User : Entity
     public byte[] PasswordHash { get; set; } = [];
     public byte[] PasswordSalt { get; set; } = [];
     public decimal BrokerageRate { get; set; }
+    public InvestorProfile Profile { get; set; }
     public ICollection<Operation> Operations { get; set; } = [];
     public ICollection<Position> Positions { get; set; } = [];
 
@@ -17,7 +20,8 @@ public class User : Entity
         string email,
         byte[] passwordHash,
         byte[] passwordSalt,
-        decimal brokerageRate
+        decimal brokerageRate,
+        InvestorProfile profile
     )
     {
         Name = name;
@@ -25,5 +29,6 @@ public class User : Entity
         PasswordHash = passwordHash;
         PasswordSalt = passwordSalt;
         BrokerageRate = brokerageRate;
+        Profile = profile;
     }
 }
