@@ -40,6 +40,6 @@ public class ValidationPipelineBehavior<TRequest, TResponse>(IEnumerable<IValida
             return response;
         }
 
-        return await next(cancellationToken);
+        return await next();
     }
 }

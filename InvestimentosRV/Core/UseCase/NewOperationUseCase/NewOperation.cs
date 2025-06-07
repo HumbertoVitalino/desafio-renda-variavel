@@ -14,14 +14,16 @@ public class NewOperation(
     IPositionRepository positionRepository,
     IOperationRepository operationRepository,
     IUserRepository userRepository,
+    IQuoteRepository quoteRepository,
     IUnitOfWork unitOfWork,
-    ILogger<NewOperation> logger)
-    : IRequestHandler<NewOperationInput, Output>
+    ILogger<NewOperation> logger
+) : IRequestHandler<NewOperationInput, Output>
 {
     private readonly IAssetRepository _assetRepository = assetRepository;
     private readonly IPositionRepository _positionRepository = positionRepository;
     private readonly IOperationRepository _operationRepository = operationRepository;
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly IQuoteRepository _quoteRepository = quoteRepository;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ILogger<NewOperation> _logger = logger;
 
@@ -30,38 +32,24 @@ public class NewOperation(
         var output = new Output();
 
         var user = await _userRepository.GetAsync(input.UserId, cancellationToken);
-        if (user is null)
-        {
-            output.AddErrorMessage($"User with ID {input.UserId} not found.");
-            return output;
-        }
-
         var asset = await _assetRepository.GetByTickerAsync(input.TickerSymbol, cancellationToken);
-        if (asset is null)
-        {
-            output.AddErrorMessage($"Asset with ticker '{input.TickerSymbol}' not found.");
-            return output;
-        }
+        var quote = await _quoteRepository.GetByAssetIdAsync(asset!.Id, cancellationToken);
+        var position = await _positionRepository.GetByUserIdAndAssetIdAsync(user!.Id, asset.Id, cancellationToken);
 
-        var position = await _positionRepository.GetByUserIdAndAssetIdAsync(user.Id, asset.Id, cancellationToken);
+        var currentUnitPrice = quote!.UnitPrice;
+        var totalValue = input.Quantity * currentUnitPrice;
+        var calculatedBrokerageFee = totalValue * user.BrokerageRate;
 
         var suitabilityWarning = CheckSuitability(input, user, asset);
         if (suitabilityWarning is not null)
             output.AddMessage(suitabilityWarning);
 
-        var sellValidationError = CheckSellValidity(input, position);
-        if (sellValidationError is not null)
-        {
-            output.AddErrorMessage(sellValidationError);
-            return output;
-        }
-
-        position = UpdatePositionLogic(input, asset.Id, position);
+        position = UpdatePositionLogic(input, asset.Id, currentUnitPrice, position);
 
         if (position.Id == 0)
             await _positionRepository.CreateAsync(position, cancellationToken);
 
-        var operation = input.MapToDomain(asset.Id);
+        var operation = input.MapToDomain(asset.Id, currentUnitPrice, calculatedBrokerageFee);
 
         await _operationRepository.CreateAsync(operation, cancellationToken);
 
@@ -74,7 +62,7 @@ public class NewOperation(
         return output;
     }
 
-    private static Position UpdatePositionLogic(NewOperationInput input, int assetId, Position? position)
+    private static Position UpdatePositionLogic(NewOperationInput input, int assetId, decimal currentUnitPrice, Position? position)
     {
         if (input.Type == OperationType.Sell)
         {
@@ -85,11 +73,11 @@ public class NewOperation(
 
         if (position is null)
         {
-            return input.MapPositionToDomain(assetId);
+            return input.MapPositionToDomain(assetId, currentUnitPrice);
         }
 
         var totalValueOld = position.Quantity * position.AveragePrice;
-        var totalValueNew = input.Quantity * input.UnitPrice;
+        var totalValueNew = input.Quantity * currentUnitPrice;
         var totalQuantity = position.Quantity + input.Quantity;
         var newAveragePrice = (totalValueOld + totalValueNew) / totalQuantity;
 
@@ -103,16 +91,6 @@ public class NewOperation(
         {
             _logger.LogWarning("Trade not suitable for user profile {Profile} and asset risk {Risk}.", user.Profile, asset.Risk);
             return $"Trade not suitable for your profile ({user.Profile}) and the asset's risk ({asset.Risk}).";
-        }
-        return null;
-    }
-
-    private string? CheckSellValidity(NewOperationInput input, Position? position)
-    {
-        if (input.Type == OperationType.Sell && (position is null || position.Quantity < input.Quantity))
-        {
-            _logger.LogWarning("Insufficient assets to perform the sale for user {UserId} and asset.", input.UserId);
-            return "Insufficient assets to perform the sale.";
         }
         return null;
     }
