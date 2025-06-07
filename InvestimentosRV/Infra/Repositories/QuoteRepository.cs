@@ -6,9 +6,11 @@ namespace Infra.Repositories;
 
 public class QuoteRepository(AppDbContext context) : Repository<Quote>(context), IQuoteRepository
 {
-    public async Task<Quote?> GetByAssetIdAsync(int assetId, CancellationToken cancellationToken)
+    public async Task<Quote?> GetLatestQuoteByAssetIdAsync(int assetId, CancellationToken cancellationToken)
     {
         return await _context.Quotes
-            .FirstOrDefaultAsync(x => x.AssetId.Equals(assetId), cancellationToken);
+            .Where(x => x.AssetId.Equals(assetId))
+            .OrderByDescending(x => x.DateTime)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }
