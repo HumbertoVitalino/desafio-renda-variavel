@@ -33,7 +33,7 @@ public class NewOperation(
 
         var user = await _userRepository.GetAsync(input.UserId, cancellationToken);
         var asset = await _assetRepository.GetByTickerAsync(input.TickerSymbol, cancellationToken);
-        var quote = await _quoteRepository.GetByAssetIdAsync(asset!.Id, cancellationToken);
+        var quote = await _quoteRepository.GetLatestQuoteByAssetIdAsync(asset!.Id, cancellationToken);
         var position = await _positionRepository.GetByUserIdAndAssetIdAsync(user!.Id, asset.Id, cancellationToken);
 
         var currentUnitPrice = quote!.UnitPrice;
