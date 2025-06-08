@@ -21,4 +21,10 @@ public class QuoteRepository(AppDbContext context) : Repository<Quote>(context),
             .Select(g => g.OrderByDescending(x => x.DateTime).First())
             .ToDictionaryAsync(q => q.AssetId, q => q.UnitPrice, cancellationToken);
     }
+
+    public async Task<Quote?> GetByAssetIdAndTradeTimeAsync(int assetId, DateTime tradeTime, CancellationToken cancellationToken)
+    {
+        return await _context.Quotes
+            .FirstOrDefaultAsync(q => q.AssetId == assetId && q.DateTime == tradeTime, cancellationToken);
+    }
 }
