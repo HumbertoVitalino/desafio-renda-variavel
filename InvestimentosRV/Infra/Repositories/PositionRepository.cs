@@ -6,6 +6,13 @@ namespace Infra.Repositories;
 
 public class PositionRepository(AppDbContext context) : Repository<Position>(context), IPositionRepository
 {
+    public async Task<IEnumerable<Position>> GetAllByAssetIdAsync(int assetId, CancellationToken cancellationToken)
+    {
+        return await _context.Positions
+            .Where(p => p.AssetId == assetId && p.Quantity > 0)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<Position>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken)
     {
         return await _context.Positions
