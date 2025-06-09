@@ -12,4 +12,11 @@ public class AssetRepository(AppDbContext context) : Repository<Asset>(context),
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.TickerSymbol.Equals(tickerSymbol), cancellationToken);
     }
+
+    public async Task<IEnumerable<Asset>> GetAllAssetsAsync(CancellationToken cancellationToken)
+    {
+        return await _context.Assets
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
 }
