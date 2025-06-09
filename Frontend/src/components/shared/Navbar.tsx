@@ -1,10 +1,9 @@
 import { AppBar, Toolbar, Button, Typography, Box } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
 
   return (
     <AppBar position="static" elevation={0}>
@@ -21,7 +20,7 @@ export default function Navbar() {
             letterSpacing: 1,
           }}
         >
-          Camarão Investimentos
+          🍤 Camarão Investimentos
         </Typography>
         {user ? (
           <Box>
