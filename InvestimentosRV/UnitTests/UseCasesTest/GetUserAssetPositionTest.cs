@@ -35,28 +35,28 @@ public class GetUserAssetPositionTest
         );
     }
 
-    [Fact(DisplayName = "Handle > Erro > Deve retornar erro quando o ativo não for encontrado")]
+    [Fact(DisplayName = "Handle > Error > Should return error when asset is not found")]
     public async Task Handle_ShouldReturnError_WhenAssetIsNotFound()
     {
-        // Arrange
+        // Arrange  
         var input = new AutoFaker<GetUserAssetPositionInput>().Generate();
 
         _assetRepositoryMock.Setup(r => r.GetByTickerAsync(input.TickerSymbol, It.IsAny<CancellationToken>())).ReturnsAsync((Asset?)null);
 
-        // Act
+        // Act  
         var result = await _useCase.Handle(input, CancellationToken.None);
 
-        // Assert
+        // Assert  
         Assert.False(result.IsValid);
         Assert.Contains($"Asset with ticker symbol '{input.TickerSymbol}' not found.", result.ErrorMessages);
 
         _positionRepositoryMock.Verify(p => p.GetByUserIdAndAssetIdAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
-    [Fact(DisplayName = "Handle > Erro > Deve retornar erro quando a posição não for encontrada")]
+    [Fact(DisplayName = "Handle > Error > Should return error when position is not found")]
     public async Task Handle_ShouldReturnError_WhenPositionIsNotFound()
     {
-        // Arrange
+        // Arrange  
         var input = new AutoFaker<GetUserAssetPositionInput>().Generate();
         var asset = new AutoFaker<Asset>()
             .RuleFor(a => a.TickerSymbol, input.TickerSymbol)
@@ -68,18 +68,18 @@ public class GetUserAssetPositionTest
         _positionRepositoryMock.Setup(p => p.GetByUserIdAndAssetIdAsync(input.UserId, asset.Id, It.IsAny<CancellationToken>()))
                                .ReturnsAsync((Position?)null);
 
-        // Act
+        // Act  
         var result = await _useCase.Handle(input, CancellationToken.None);
 
-        // Assert
+        // Assert  
         Assert.False(result.IsValid);
         Assert.Contains($"Position for user {input.UserId} and asset '{asset.TickerSymbol}' not found.", result.ErrorMessages);
     }
 
-    [Fact(DisplayName = "Handle > Sucesso > Deve retornar DTO da posição quando encontrada")]
+    [Fact(DisplayName = "Handle > Success > Should return position DTO when found")]
     public async Task Handle_ShouldReturnPositionDto_WhenFound()
     {
-        // Arrange
+        // Arrange  
         var input = new AutoFaker<GetUserAssetPositionInput>().Generate();
         var asset = new AutoFaker<Asset>().Generate();
         var position = new AutoFaker<Position>().Generate();
@@ -92,10 +92,10 @@ public class GetUserAssetPositionTest
         _positionRepositoryMock.Setup(p => p.GetByUserIdAndAssetIdAsync(input.UserId, asset.Id, It.IsAny<CancellationToken>()))
                                .ReturnsAsync(position);
 
-        // Act
+        // Act  
         var result = await _useCase.Handle(input, CancellationToken.None);
 
-        // Assert
+        // Assert  
         Assert.True(result.IsValid);
         Assert.Empty(result.ErrorMessages);
 

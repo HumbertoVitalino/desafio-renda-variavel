@@ -102,7 +102,6 @@ public class UserMapperTest
         Assert.Equal(request.Password, result.Password);
     }
 
-
     private static (byte[] passwordHash, byte[] passwordSalt) CreatePasswordHash(string password)
     {
         var salt = RandomNumberGenerator.GetBytes(16);

@@ -27,32 +27,32 @@ public class NewUserTest
         _useCase = new NewUser(_repositoryMock.Object, _passwordServiceMock.Object, _unitOfWorkMock.Object, _loggerMock.Object);
     }
 
-    [Fact(DisplayName = "Handle > Erro > Deve retornar erro quando e-mail já existir")]
+    [Fact(DisplayName = "Handle > Error > Should return error when email already exists")]
     public async Task Handle_ShouldReturnError_WhenEmailAlreadyExists()
     {
-        // Arrange
+        // Arrange  
         var user = AutoFaker.Generate<User>();
         var input = new AutoFaker<NewUserInput>().Generate();
         _repositoryMock.Setup(r => r.GetByEmailAsync(input.Email, It.IsAny<CancellationToken>()))
                        .ReturnsAsync(user);
 
-        // Act
+        // Act  
         var result = await _useCase.Handle(input, CancellationToken.None);
 
-        // Assert
+        // Assert  
         Assert.False(result.IsValid);
         Assert.Contains("This email already exists.", result.ErrorMessages);
         _repositoryMock.Verify(r => r.CreateAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
-    [Theory(DisplayName = "Handle > Sucesso > Deve criar usuário com a taxa de corretagem correta")]
+    [Theory(DisplayName = "Handle > Success > Should create user with correct brokerage rate")]
     [InlineData(InvestorProfile.Conservative, 0.0050)]
     [InlineData(InvestorProfile.Moderate, 0.0025)]
     [InlineData(InvestorProfile.Bold, 0.0010)]
     public async Task Handle_ShouldCreateUser_WhenInputIsValid(InvestorProfile profile, decimal expectedRate)
     {
-        // Arrange
+        // Arrange  
         var input = new AutoFaker<NewUserInput>()
             .RuleFor(x => x.Profile, profile)
             .Generate();
@@ -66,10 +66,10 @@ public class NewUserTest
         _passwordServiceMock.Setup(p => p.CreatePasswordHash(input.Password))
                             .Returns((passwordHash, passwordSalt));
 
-        // Act
+        // Act  
         var result = await _useCase.Handle(input, CancellationToken.None);
 
-        // Assert
+        // Assert  
         var userDto = result.GetResult<UserDto>();
         Assert.True(result.IsValid);
         Assert.NotNull(userDto);
