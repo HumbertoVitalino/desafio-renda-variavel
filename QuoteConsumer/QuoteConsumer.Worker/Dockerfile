@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY ["InvestimentosRV/Api/Api.csproj", "InvestimentosRV/Api/"]
+COPY ["InvestimentosRV/Core/Core.csproj", "InvestimentosRV/Core/"]
+COPY ["InvestimentosRV/Infra/Infra.csproj", "InvestimentosRV/Infra/"]
+COPY ["QuoteConsumer/QuoteConsumer.Worker/QuoteConsumer.Worker.csproj", "QuoteConsumer/QuoteConsumer.Worker/"]
+COPY ["QuoteProducer/QuoteProducer.Console/QuoteProducer.Console.csproj", "QuoteProducer/QuoteProducer.Console/"]
+
+RUN dotnet restore "QuoteConsumer/QuoteConsumer.Worker/QuoteConsumer.Worker.csproj"
+
+COPY . .
+
+WORKDIR "/src/QuoteConsumer/QuoteConsumer.Worker"
+RUN dotnet publish "QuoteConsumer.Worker.csproj" -c Release -o /app/publish --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "QuoteConsumer.Worker.dll"]
