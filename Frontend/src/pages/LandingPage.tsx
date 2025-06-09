@@ -38,11 +38,11 @@ export default function LandingPage() {
           >
             <img
               src={logo}
-              alt="Logo InvestTrack"
+              alt="Logo CamarãoInvestimentos"
               style={{ width: 72, height: 72, marginBottom: 16, marginTop: 8 }}
             />
             <Typography component="h1" variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-              Bem-vindo à InvestTrack
+              Camarão Investimentos
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, textAlign: 'center' }}>
               Gerencie seus investimentos, acompanhe suas posições e descubra insights de mercado.

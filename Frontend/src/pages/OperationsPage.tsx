@@ -48,7 +48,7 @@ export default function OperationsPage({ noContainer = false }: Props) {
     setMarketLoading(true);
     try {
       const [positionsRes, assetsRes] = await Promise.all([getAllPositions(), getAllAssets()]);
-      if (positionsRes.data.result) setPositions(positionsRes.data.result);
+      setPositions(positionsRes.data.result ?? []); // sempre seta positions, mesmo vazio
       if (assetsRes.data.result) {
         const assets = assetsRes.data.result;
         setAllAssets(assets);
@@ -107,6 +107,8 @@ export default function OperationsPage({ noContainer = false }: Props) {
     operationFormRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const tickerOptions = allAssets.map(asset => asset.tickerSymbol);
+
   const content = (
     <>
       <Paper
@@ -121,12 +123,13 @@ export default function OperationsPage({ noContainer = false }: Props) {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="center">
             <Autocomplete
               freeSolo
-              options={allAssets}
-              getOptionLabel={(option) => typeof option === 'string' ? option : option.tickerSymbol}
-              value={allAssets.find(asset => asset.tickerSymbol === form.tickerSymbol) || form.tickerSymbol}
+              options={tickerOptions}
+              value={form.tickerSymbol}
+              onInputChange={(_, newInputValue) => {
+                setForm(prev => ({ ...prev, tickerSymbol: newInputValue.toUpperCase() }));
+              }}
               onChange={(_, newValue) => {
-                const newTicker = typeof newValue === 'string' ? newValue : newValue?.tickerSymbol || '';
-                setForm(prev => ({ ...prev, tickerSymbol: newTicker.toUpperCase() }));
+                setForm(prev => ({ ...prev, tickerSymbol: (newValue || '').toUpperCase() }));
               }}
               fullWidth
               sx={{ minWidth: 150, flex: 2 }}
@@ -146,19 +149,25 @@ export default function OperationsPage({ noContainer = false }: Props) {
 
       <Typography variant="h5" fontWeight={700} mb={2} align="center"><ShowChartIcon sx={{verticalAlign: 'middle', mr: 1}}/> Minhas Posições</Typography>
       <Stack direction="row" flexWrap="wrap" spacing={2} justifyContent="center" mb={4}>
-        {marketLoading && Array.from(new Array(3)).map((_, index) => <Skeleton key={index} variant="rounded" width={240} height={158} sx={{ borderRadius: 3}} />)}
-        {!marketLoading && positions.length === 0 && <Typography color="text.secondary">Nenhuma posição encontrada.</Typography>}
-        {!marketLoading && positions.map(pos => (
-          <Card key={pos.tickerSymbol} sx={{ flex: '1 1 240px', minWidth: 220, maxWidth: 280, background: 'rgba(40,40,40,0.8)', borderRadius: 3, transition: 'transform 0.2s', '&:hover': {transform: 'scale(1.03)'} }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight={700} color="primary" gutterBottom>{pos.assetName} ({pos.tickerSymbol})</Typography>
-              <Typography variant="body2" color="text.secondary">Quantidade: <b>{pos.quantity}</b></Typography>
-              <Typography variant="body2" color="text.secondary">Preço Médio: <b>R$ {pos.averagePrice.toFixed(2)}</b></Typography>
-              <Typography variant="body2" color={pos.currentProfitAndLoss >= 0 ? 'success.main' : 'error.main'}>P/L Atual: <b>R$ {pos.currentProfitAndLoss.toFixed(2)}</b></Typography>
-              <Button size="small" variant="outlined" startIcon={<SellIcon />} onClick={() => handleSelectAssetForTrade(pos.tickerSymbol, OperationType.Sell)} sx={{ mt: 2, width: '100%' }}>Vender</Button>
-            </CardContent>
-          </Card>
-        ))}
+        {marketLoading ? (
+          Array.from(new Array(3)).map((_, index) => (
+            <Skeleton key={index} variant="rounded" width={240} height={158} sx={{ borderRadius: 3}} />
+          ))
+        ) : positions.length === 0 ? (
+          <Typography color="text.secondary">Nenhuma posição encontrada.</Typography>
+        ) : (
+          positions.map(pos => (
+            <Card key={pos.tickerSymbol} sx={{ flex: '1 1 240px', minWidth: 220, maxWidth: 280, background: 'rgba(40,40,40,0.8)', borderRadius: 3, transition: 'transform 0.2s', '&:hover': {transform: 'scale(1.03)'} }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight={700} color="primary" gutterBottom>{pos.assetName} ({pos.tickerSymbol})</Typography>
+                <Typography variant="body2" color="text.secondary">Quantidade: <b>{pos.quantity}</b></Typography>
+                <Typography variant="body2" color="text.secondary">Preço Médio: <b>R$ {pos.averagePrice.toFixed(2)}</b></Typography>
+                <Typography variant="body2" color={pos.currentProfitAndLoss >= 0 ? 'success.main' : 'error.main'}>P/L Atual: <b>R$ {pos.currentProfitAndLoss.toFixed(2)}</b></Typography>
+                <Button size="small" variant="outlined" startIcon={<SellIcon />} onClick={() => handleSelectAssetForTrade(pos.tickerSymbol, OperationType.Sell)} sx={{ mt: 2, width: '100%' }}>Vender</Button>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </Stack>
 
       <Typography variant="h5" fontWeight={700} mb={2} align="center"><AddShoppingCartIcon sx={{verticalAlign: 'middle', mr: 1}}/> Mercado de Ativos</Typography>
@@ -174,26 +183,35 @@ export default function OperationsPage({ noContainer = false }: Props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {marketLoading && Array.from(new Array(5)).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell><Skeleton variant="text" /></TableCell>
-                  <TableCell><Skeleton variant="text" /></TableCell>
-                  <TableCell><Skeleton variant="text" /></TableCell>
-                  <TableCell><Skeleton variant="text" /></TableCell>
-                </TableRow>
-              ))}
-              {!marketLoading && allAssets.map((asset) => (
-                <TableRow key={asset.id} hover>
-                  <TableCell sx={{ fontWeight: 'bold' }}>{asset.tickerSymbol}</TableCell>
-                  <TableCell>{asset.name}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>{marketQuotes[asset.tickerSymbol] ? `R$ ${marketQuotes[asset.tickerSymbol].unitPrice.toFixed(2)}` : '---'}</TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="Comprar este ativo">
-                      <Button size="small" variant="contained" onClick={() => handleSelectAssetForTrade(asset.tickerSymbol, OperationType.Buy)}>Comprar</Button>
-                    </Tooltip>
+              {marketLoading ? (
+                Array.from(new Array(5)).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell><Skeleton variant="text" /></TableCell>
+                    <TableCell><Skeleton variant="text" /></TableCell>
+                    <TableCell><Skeleton variant="text" /></TableCell>
+                    <TableCell><Skeleton variant="text" /></TableCell>
+                  </TableRow>
+                ))
+              ) : allAssets.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    <Typography color="text.secondary">Nenhum ativo disponível.</Typography>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                allAssets.map((asset) => (
+                  <TableRow key={asset.id} hover>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{asset.tickerSymbol}</TableCell>
+                    <TableCell>{asset.name}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold' }}>{marketQuotes[asset.tickerSymbol] ? `R$ ${marketQuotes[asset.tickerSymbol].unitPrice.toFixed(2)}` : '---'}</TableCell>
+                    <TableCell align="center">
+                      <Tooltip title="Comprar este ativo">
+                        <Button size="small" variant="contained" onClick={() => handleSelectAssetForTrade(asset.tickerSymbol, OperationType.Buy)}>Comprar</Button>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
