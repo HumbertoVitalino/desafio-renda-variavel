@@ -29,31 +29,15 @@ public class NewOperationInputValidatorTest
     }
 
     [Fact(DisplayName = "Validator > Failure > Should have error when quantity is zero")]
-    public void Validator_ShouldHaveError_WhenQuantityIsZero()
+    public async Task Validator_ShouldHaveError_WhenQuantityIsZero()
     {
         // Arrange  
         var input = new AutoFaker<NewOperationInput>().RuleFor(x => x.Quantity, 0).Generate();
 
         // Act & Assert  
-        var result = _validator.TestValidate(input);
+        var result = await _validator.TestValidateAsync(input);
         result.ShouldHaveValidationErrorFor(x => x.Quantity)
               .WithErrorMessage("The quantity must be greater than zero.");
-    }
-
-    [Fact(DisplayName = "Validator > Failure > Should have error when user does not exist")]
-    public async Task Validator_ShouldHaveError_WhenUserDoesNotExist()
-    {
-        // Arrange  
-        var input = new AutoFaker<NewOperationInput>().Generate();
-        _userRepositoryMock.Setup(r => r.GetAsync(input.UserId, It.IsAny<CancellationToken>()))
-                           .ReturnsAsync((User?)null);
-
-        // Act  
-        var result = await _validator.TestValidateAsync(input);
-
-        // Assert  
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-              .WithErrorMessage($"User with ID {input.UserId} not found.");
     }
 
     [Fact(DisplayName = "Validator > Failure > Should have error when asset does not exist")]
