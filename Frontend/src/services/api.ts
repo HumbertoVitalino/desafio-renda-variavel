@@ -1,5 +1,4 @@
 import axios, { AxiosResponse } from 'axios';
-// Importando todos os nossos tipos para garantir a segurança
 import {
   ApiResponse,
   LoginUserRequest,
@@ -10,7 +9,8 @@ import {
   OperationDto,
   QuoteDto,
   PositionDto,
-  TopClientsDto
+  TopClientsDto,
+  AssetDto
 } from '../types/api';
 
 const apiClient = axios.create({
@@ -61,5 +61,8 @@ export const getTop10ByBrokerage = (): Promise<AxiosResponse<ApiResponse<any>>> 
   return apiClient.get('/reports/top-10/by-brokerage');
 };
 
+export const getAllAssets = (): Promise<AxiosResponse<ApiResponse<AssetDto[]>>> => {
+  return apiClient.get('/assets');
+};
 
 export default apiClient;

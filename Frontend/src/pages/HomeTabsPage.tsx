@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Tabs, Tab, Paper } from '@mui/material';
+import { Box, Tabs, Tab, Paper, Container } from '@mui/material';
 import DashboardPage from './DashboardPage';
 import OperationsPage from './OperationsPage';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -9,7 +9,6 @@ export default function HomeTabsPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState(0);
 
-  // Permite abrir direto na aba de operações via ?tab=1
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tabParam = params.get('tab');
@@ -20,7 +19,7 @@ export default function HomeTabsPage() {
   }, [location.search]);
 
   return (
-    <Box sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Paper
         elevation={6}
         sx={{
@@ -34,17 +33,17 @@ export default function HomeTabsPage() {
           onChange={(_, newValue) => setTab(newValue)}
           indicatorColor="primary"
           textColor="primary"
-          variant="fullWidth"
+          centered
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
-          <Tab label="Dashboard" />
-          <Tab label="Operações" />
+          <Tab label="Dashboard" sx={{ fontWeight: 600 }} />
+          <Tab label="Operações" sx={{ fontWeight: 600 }} />
         </Tabs>
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 2, sm: 3 } }}>
           {tab === 0 && <DashboardPage noContainer />}
           {tab === 1 && <OperationsPage noContainer />}
         </Box>
       </Paper>
-    </Box>
+    </Container>
   );
 }

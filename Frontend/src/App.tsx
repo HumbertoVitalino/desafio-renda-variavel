@@ -7,7 +7,7 @@ import Footer from './components/shared/Footer';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LandingPage from './pages/LandingPage';
-import HomeTabsPage from './pages/HomeTabsPage'; // Importa as abas
+import HomeTabsPage from './pages/HomeTabsPage';
 import theme from './styles/theme';
 
 function App() {
@@ -17,35 +17,35 @@ function App() {
       <AuthProvider>
         <Router>
           <Navbar />
-          <Container
-            component="main"
-            maxWidth={false}
-            disableGutters
-            sx={{
-              mt: 4,
-              mb: 4,
-              minHeight: 'calc(100vh - 120px)',
-              display: 'flex',
-              flexDirection: 'column',
-              background: 'transparent !important',
-              flex: 1,
-            }}
-          >
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Container
+                    component="main"
+                    maxWidth={false}
+                    disableGutters
+                    sx={{
+                      mt: 4,
+                      mb: 4,
+                      minHeight: 'calc(100vh - 120px)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent !important',
+                      flex: 1,
+                    }}
+                  >
                     <HomeTabsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </Container>
+                  </Container>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
           <Footer />
         </Router>
       </AuthProvider>
