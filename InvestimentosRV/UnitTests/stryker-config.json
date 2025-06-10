@@ -1,0 +1,15 @@
+{
+  "stryker-config": {
+    "solution": "..\\InvestimentosRV.sln",
+    "project": "desafio-renda-variavel/InvestimentosRV/Core/Core.csproj",
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 50
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ]
+  }
+}
