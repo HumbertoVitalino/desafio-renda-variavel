@@ -1,7 +1,32 @@
-import { useEffect, useState } from 'react';
-import { Box, Button, Stack, TextField, Typography, MenuItem, Paper, Card, CardContent, Container } from '@mui/material';
-import { createOperation, getAllPositions } from '../services/api';
-import { OperationType, NewOperationRequest, PositionDto } from '../types/api';
+import { useEffect, useState, useRef } from 'react';
+import {
+  Box,
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  Paper,
+  Card,
+  CardContent,
+  Container,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Autocomplete,
+  ToggleButtonGroup,
+  ToggleButton,
+  Skeleton,
+  Tooltip,
+} from '@mui/material';
+import { createOperation, getAllPositions, getLatestQuote, getAllAssets } from '../services/api';
+import { OperationType, NewOperationRequest, PositionDto, QuoteDto, AssetDto } from '../types/api';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import SellIcon from '@mui/icons-material/Sell';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 
 type Props = { noContainer?: boolean };
 
@@ -9,154 +34,188 @@ export default function OperationsPage({ noContainer = false }: Props) {
   const [positions, setPositions] = useState<PositionDto[]>([]);
   const [form, setForm] = useState<NewOperationRequest>({
     tickerSymbol: '',
-    quantity: 0,
+    quantity: 1,
     type: OperationType.Buy,
   });
-  const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [allAssets, setAllAssets] = useState<AssetDto[]>([]);
+  const [marketQuotes, setMarketQuotes] = useState<Record<string, QuoteDto>>({});
+  const [marketLoading, setMarketLoading] = useState(true);
 
-  const fetchPositions = () => {
-    getAllPositions().then(res => {
-      if (res.data.result) setPositions(res.data.result);
-    });
+  const operationFormRef = useRef<HTMLDivElement>(null);
+
+  const fetchInitialData = async () => {
+    setMarketLoading(true);
+    try {
+      const [positionsRes, assetsRes] = await Promise.all([getAllPositions(), getAllAssets()]);
+      setPositions(positionsRes.data.result ?? []); // sempre seta positions, mesmo vazio
+      if (assetsRes.data.result) {
+        const assets = assetsRes.data.result;
+        setAllAssets(assets);
+        const quotePromises = assets.map(asset => getLatestQuote(asset.tickerSymbol));
+        const quoteResults = await Promise.allSettled(quotePromises);
+        const quotesMap: Record<string, QuoteDto> = {};
+        quoteResults.forEach((result, index) => {
+          if (result.status === 'fulfilled' && result.value.data.result) {
+            quotesMap[assets[index].tickerSymbol] = result.value.data.result;
+          }
+        });
+        setMarketQuotes(quotesMap);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dados iniciais:", error);
+    } finally {
+      setMarketLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchPositions();
+    fetchInitialData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [name]: name === 'quantity' ? Number(value) : value,
-    }));
+    setForm(prev => ({ ...prev, [name]: name === 'quantity' ? Number(value) : value.toUpperCase() }));
+  };
+
+  const handleOperationTypeChange = (_: React.MouseEvent<HTMLElement>, newType: OperationType | null) => {
+    if (newType !== null) {
+      setForm(prev => ({ ...prev, type: newType }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitLoading(true);
     try {
       await createOperation(form);
-      fetchPositions();
-      setForm({ tickerSymbol: '', quantity: 0, type: OperationType.Buy });
-    } catch {
-      alert('Erro ao registrar operação.');
+      setForm({ tickerSymbol: '', quantity: 1, type: OperationType.Buy });
+      fetchInitialData();
+    } catch (error: any) {
+      alert(error?.response?.data?.errorMessages?.[0] || 'Erro ao registrar operação.');
     } finally {
-      setLoading(false);
+      setSubmitLoading(false);
     }
   };
+  
+  const handleSelectAssetForTrade = (ticker: string, type: OperationType) => {
+    setForm({
+      tickerSymbol: ticker,
+      quantity: 1,
+      type: type,
+    });
+    operationFormRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const tickerOptions = allAssets.map(asset => asset.tickerSymbol);
 
   const content = (
     <>
       <Paper
-        elevation={6}
-        sx={{
-          p: 4,
-          borderRadius: 4,
-          background: 'rgba(30,30,30,0.97)',
-          boxShadow: '0 8px 32px 0 rgba(0,0,0,0.25)',
-          mb: 4,
-        }}
+        ref={operationFormRef}
+        elevation={12}
+        sx={{ p: 4, borderRadius: 4, background: 'rgba(30,30,30,0.9)', backdropFilter: 'blur(5px)', mb: 4 }}
       >
-        <Typography variant="h5" fontWeight={700} mb={2}>
-          Nova Operação
+        <Typography variant="h5" fontWeight={700} mb={3} align="center">
+          Registrar Operação
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={2}
-            alignItems="flex-start"
-          >
-            <TextField
-              label="Ticker"
-              name="tickerSymbol"
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="center">
+            <Autocomplete
+              freeSolo
+              options={tickerOptions}
               value={form.tickerSymbol}
-              onChange={handleChange}
+              onInputChange={(_, newInputValue) => {
+                setForm(prev => ({ ...prev, tickerSymbol: newInputValue.toUpperCase() }));
+              }}
+              onChange={(_, newValue) => {
+                setForm(prev => ({ ...prev, tickerSymbol: (newValue || '').toUpperCase() }));
+              }}
               fullWidth
-              required
-              sx={{ minWidth: 150, flex: 1 }}
-              inputProps={{ style: { textTransform: 'uppercase' } }}
+              sx={{ minWidth: 150, flex: 2 }}
+              renderInput={(params) => <TextField {...params} label="Ticker do Ativo" required />}
             />
-            <TextField
-              label="Quantidade"
-              name="quantity"
-              type="number"
-              value={form.quantity}
-              onChange={handleChange}
-              fullWidth
-              required
-              sx={{ minWidth: 150, flex: 1 }}
-              inputProps={{ min: 1 }}
-            />
-            <TextField
-              select
-              label="Tipo"
-              name="type"
-              value={form.type}
-              onChange={handleChange}
-              fullWidth
-              required
-              sx={{ minWidth: 150, flex: 1 }}
-            >
-              <MenuItem value={OperationType.Buy}>Compra</MenuItem>
-              <MenuItem value={OperationType.Sell}>Venda</MenuItem>
-            </TextField>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              sx={{ minWidth: 140, fontWeight: 700, borderRadius: 2, height: 56 }}
-              disabled={loading}
-            >
-              {loading ? 'Registrando...' : 'Registrar'}
+            <TextField label="Quantidade" name="quantity" type="number" value={form.quantity} onChange={handleFormChange} required sx={{ minWidth: 120, flex: 1 }} inputProps={{ min: 1 }}/>
+            <ToggleButtonGroup value={form.type} exclusive onChange={handleOperationTypeChange} color="primary" sx={{ flex: 1.5, height: 56 }}>
+              <ToggleButton value={OperationType.Buy} sx={{ flex: 1, fontWeight: 600 }}>Compra</ToggleButton>
+              <ToggleButton value={OperationType.Sell} sx={{ flex: 1, fontWeight: 600 }}>Venda</ToggleButton>
+            </ToggleButtonGroup>
+            <Button type="submit" variant="contained" size="large" sx={{ height: 56, fontWeight: 700, flex: 1 }} disabled={submitLoading}>
+              {submitLoading ? <CircularProgress size={24} color="inherit" /> : 'Registrar'}
             </Button>
           </Stack>
         </Box>
       </Paper>
 
-      <Typography variant="h5" fontWeight={700} mb={2}>
-        Minhas Posições
-      </Typography>
-      <Stack
-        direction="row"
-        flexWrap="wrap"
-        spacing={2}
-        justifyContent="flex-start"
-      >
-        {positions.length === 0 && (
-          <Typography color="text.secondary" sx={{ ml: 1 }}>
-            Nenhuma posição encontrada.
-          </Typography>
+      <Typography variant="h5" fontWeight={700} mb={2} align="center"><ShowChartIcon sx={{verticalAlign: 'middle', mr: 1}}/> Minhas Posições</Typography>
+      <Stack direction="row" flexWrap="wrap" spacing={2} justifyContent="center" mb={4}>
+        {marketLoading ? (
+          Array.from(new Array(3)).map((_, index) => (
+            <Skeleton key={index} variant="rounded" width={240} height={158} sx={{ borderRadius: 3}} />
+          ))
+        ) : positions.length === 0 ? (
+          <Typography color="text.secondary">Nenhuma posição encontrada.</Typography>
+        ) : (
+          positions.map(pos => (
+            <Card key={pos.tickerSymbol} sx={{ flex: '1 1 240px', minWidth: 220, maxWidth: 280, background: 'rgba(40,40,40,0.8)', borderRadius: 3, transition: 'transform 0.2s', '&:hover': {transform: 'scale(1.03)'} }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight={700} color="primary" gutterBottom>{pos.assetName} ({pos.tickerSymbol})</Typography>
+                <Typography variant="body2" color="text.secondary">Quantidade: <b>{pos.quantity}</b></Typography>
+                <Typography variant="body2" color="text.secondary">Preço Médio: <b>R$ {pos.averagePrice.toFixed(2)}</b></Typography>
+                <Typography variant="body2" color={pos.currentProfitAndLoss >= 0 ? 'success.main' : 'error.main'}>P/L Atual: <b>R$ {pos.currentProfitAndLoss.toFixed(2)}</b></Typography>
+                <Button size="small" variant="outlined" startIcon={<SellIcon />} onClick={() => handleSelectAssetForTrade(pos.tickerSymbol, OperationType.Sell)} sx={{ mt: 2, width: '100%' }}>Vender</Button>
+              </CardContent>
+            </Card>
+          ))
         )}
-        {positions.map(pos => (
-          <Card
-            key={pos.tickerSymbol}
-            sx={{
-              flex: '1 1 300px',
-              minWidth: 300,
-              background: 'rgba(30,30,30,0.97)',
-              borderRadius: 3,
-              mb: 2,
-              boxShadow: '0 4px 16px 0 rgba(0,0,0,0.10)',
-            }}
-          >
-            <CardContent>
-              <Typography variant="h6" fontWeight={700} color="primary" gutterBottom>
-                {pos.assetName} ({pos.tickerSymbol})
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Quantidade: <b>{pos.quantity}</b>
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Preço Médio: <b>R$ {pos.averagePrice.toFixed(2)}</b>
-              </Typography>
-              <Typography variant="body2" color={pos.currentProfitAndLoss >= 0 ? 'success.main' : 'error.main'}>
-                P/L Atual: <b>R$ {pos.currentProfitAndLoss.toFixed(2)}</b>
-              </Typography>
-            </CardContent>
-          </Card>
-        ))}
       </Stack>
+
+      <Typography variant="h5" fontWeight={700} mb={2} align="center"><AddShoppingCartIcon sx={{verticalAlign: 'middle', mr: 1}}/> Mercado de Ativos</Typography>
+      <Paper elevation={6} sx={{ background: 'rgba(30,30,30,0.9)', backdropFilter: 'blur(5px)', borderRadius: 4 }}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Ticker</TableCell>
+                <TableCell>Nome do Ativo</TableCell>
+                <TableCell align="right">Preço Atual (R$)</TableCell>
+                <TableCell align="center">Ação</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {marketLoading ? (
+                Array.from(new Array(5)).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell><Skeleton variant="text" /></TableCell>
+                    <TableCell><Skeleton variant="text" /></TableCell>
+                    <TableCell><Skeleton variant="text" /></TableCell>
+                    <TableCell><Skeleton variant="text" /></TableCell>
+                  </TableRow>
+                ))
+              ) : allAssets.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    <Typography color="text.secondary">Nenhum ativo disponível.</Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                allAssets.map((asset) => (
+                  <TableRow key={asset.id} hover>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{asset.tickerSymbol}</TableCell>
+                    <TableCell>{asset.name}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold' }}>{marketQuotes[asset.tickerSymbol] ? `R$ ${marketQuotes[asset.tickerSymbol].unitPrice.toFixed(2)}` : '---'}</TableCell>
+                    <TableCell align="center">
+                      <Tooltip title="Comprar este ativo">
+                        <Button size="small" variant="contained" onClick={() => handleSelectAssetForTrade(asset.tickerSymbol, OperationType.Buy)}>Comprar</Button>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
     </>
   );
 

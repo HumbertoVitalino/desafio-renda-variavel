@@ -85,3 +85,10 @@ export interface ApiResponse<T> {
   messages?: string[];
   errorMessages?: string[];
 }
+
+export interface AssetDto {
+  id: number;
+  tickerSymbol: string;
+  name: string;
+  risk: AssetRisk;
+}
