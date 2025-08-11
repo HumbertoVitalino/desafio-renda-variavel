@@ -1,7 +1,7 @@
 ﻿using Moq;
 using AutoBogus;
-using Core.Domain;
-using Core.Domain.Enums;
+using Domain;
+using Domain.Enums;
 using Core.Interfaces;
 using Core.UseCase.NewOperationUseCase;
 using Core.UseCase.NewOperationUseCase.Boundaries;

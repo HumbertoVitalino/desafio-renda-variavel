@@ -1,6 +1,6 @@
 ﻿using Core.Commons;
-using Core.Domain;
-using Core.Domain.Enums;
+using Domain;
+using Domain.Enums;
 using Core.Interfaces;
 using Core.Mappers;
 using Core.UseCase.NewOperationUseCase.Boundaries;

@@ -1,4 +1,4 @@
-﻿namespace Core.Domain;
+﻿namespace Domain;
 
 public class Quote : Entity
 {

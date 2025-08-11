@@ -1,13 +1,10 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using AutoBogus;
 using Core.UseCase.GetUserAssetPositionUseCase;
 using Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Core.UseCase.GetUserAssetPositionUseCase.Boundaries;
-using System.Threading.Tasks;
-using System.Threading;
-using Core.Domain;
+using Domain;
 using Core.Dtos;
 
 namespace UnitTests.UseCasesTest;

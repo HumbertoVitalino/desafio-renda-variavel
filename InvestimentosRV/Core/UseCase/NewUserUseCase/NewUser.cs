@@ -1,5 +1,5 @@
 ﻿using Core.Commons;
-using Core.Domain.Enums;
+using Domain.Enums;
 using Core.Interfaces;
 using Core.Mappers;
 using Core.UseCase.NewUserUseCase.Boundaries;

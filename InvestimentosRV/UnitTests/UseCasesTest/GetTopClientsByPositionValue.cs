@@ -1,11 +1,6 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using AutoBogus;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Domain;
+using Domain;
 using Core.Interfaces;
 using Core.UseCase.GetTopClientsByPositionValueUseCase;
 using Core.UseCase.GetTopClientsByPositionValueUseCase.Boundaries;

@@ -1,8 +1,8 @@
 ﻿using Moq;
 using AutoBogus;
 using FluentValidation.TestHelper;
-using Core.Domain;
-using Core.Domain.Enums;
+using Domain;
+using Domain.Enums;
 using Core.Interfaces;
 using Core.UseCase.NewOperationUseCase.Boundaries;
 

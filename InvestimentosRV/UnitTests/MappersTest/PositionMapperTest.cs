@@ -1,5 +1,5 @@
 ﻿using AutoBogus;
-using Core.Domain;
+using Domain;
 using Core.Mappers;
 using Core.UseCase.NewOperationUseCase.Boundaries;
 

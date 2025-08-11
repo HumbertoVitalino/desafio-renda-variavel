@@ -1,7 +1,7 @@
 ﻿using Api.Requests;
 using Api.Mappers;
 using AutoBogus;
-using Core.Domain;
+using Domain;
 using Core.Mappers;
 using Core.UseCase.NewUserUseCase.Boundaries;
 using System.Security.Cryptography;

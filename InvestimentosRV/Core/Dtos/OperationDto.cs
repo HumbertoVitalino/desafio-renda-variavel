@@ -1,4 +1,4 @@
-﻿using Core.Domain.Enums;
+﻿using Domain.Enums;
 
 namespace Core.Dtos;
 

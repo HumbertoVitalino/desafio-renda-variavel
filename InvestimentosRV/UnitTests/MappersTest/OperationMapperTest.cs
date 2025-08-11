@@ -1,8 +1,8 @@
-﻿using AutoBogus;
+﻿using Domain;
+using Domain.Enums;
+using AutoBogus;
 using Core.Mappers;
-using Core.Domain.Enums;
 using Core.UseCase.NewOperationUseCase.Boundaries;
-using Core.Domain;
 using Api.Requests;
 using Api.Mappers;
 

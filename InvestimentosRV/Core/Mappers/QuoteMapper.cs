@@ -1,4 +1,4 @@
-﻿using Core.Domain;
+﻿using Domain;
 using Core.Dtos;
 
 namespace Core.Mappers;

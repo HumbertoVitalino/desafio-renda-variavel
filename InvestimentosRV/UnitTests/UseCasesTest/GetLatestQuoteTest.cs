@@ -1,6 +1,6 @@
 ﻿using Moq;
 using AutoBogus;
-using Core.Domain;
+using Domain;
 using Core.Interfaces;
 using Core.UseCase.GetLatestQuoteUseCase;
 using Core.UseCase.GetLatestQuoteUseCase.Boundaries;

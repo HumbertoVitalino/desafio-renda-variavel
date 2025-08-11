@@ -1,5 +1,5 @@
 ﻿using Core.Commons;
-using Core.Domain.Enums;
+using Domain.Enums;
 using MediatR;
 
 namespace Core.UseCase.NewOperationUseCase.Boundaries;

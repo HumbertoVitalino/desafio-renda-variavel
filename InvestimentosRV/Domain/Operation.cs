@@ -1,6 +1,6 @@
-﻿using Core.Domain.Enums;
+﻿using Domain.Enums;
 
-namespace Core.Domain;
+namespace Domain;
 
 public class Operation : Entity
 {

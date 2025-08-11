@@ -1,6 +1,6 @@
 ﻿using AutoBogus;
-using Core.Domain;
-using Core.Domain.Enums;
+using Domain;
+using Domain.Enums;
 using Core.Dtos;
 using Core.Interfaces;
 using Core.UseCase.NewUserUseCase;

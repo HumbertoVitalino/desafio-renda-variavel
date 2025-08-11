@@ -1,4 +1,4 @@
-﻿namespace Core.Domain.Enums;
+﻿namespace Domain.Enums;
 
 public enum AssetRisk
 {
