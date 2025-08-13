@@ -4,14 +4,14 @@ namespace Domain;
 
 public class User : Entity
 {
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public byte[] PasswordHash { get; set; } = [];
-    public byte[] PasswordSalt { get; set; } = [];
-    public decimal BrokerageRate { get; set; }
-    public InvestorProfile Profile { get; set; }
-    public ICollection<Operation> Operations { get; set; } = [];
-    public ICollection<Position> Positions { get; set; } = [];
+    public string Name { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public byte[] PasswordHash { get; private set; } = [];
+    public byte[] PasswordSalt { get; private set; } = [];
+    public decimal BrokerageRate { get; private set; }
+    public InvestorProfile Profile { get; private set; }
+    public ICollection<Operation> Operations { get; private set; } = [];
+    public ICollection<Position> Positions { get; private set; } = [];
 
     protected User() { }
 

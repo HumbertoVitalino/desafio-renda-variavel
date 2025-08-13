@@ -2,11 +2,11 @@
 
 public class Quote : Entity
 {
-    public int AssetId { get; set; }
-    public decimal UnitPrice { get; set; }
-    public DateTime DateTime { get; set; }
+    public int AssetId { get; private set; }
+    public decimal UnitPrice { get; private set; }
+    public DateTime DateTime { get; private set; }
 
-    public Asset Asset { get; set; } = default!;
+    public Asset Asset { get; private set; } = default!;
 
     protected Quote() { }
 

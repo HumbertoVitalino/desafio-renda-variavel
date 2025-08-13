@@ -4,12 +4,12 @@ namespace Domain;
 
 public class Asset : Entity
 {
-    public string TickerSymbol { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public AssetRisk Risk { get; set; }
-    public ICollection<Quote> Quotes { get; set; } = [];
-    public ICollection<Operation> Operations { get; set; } = [];
-    public ICollection<Position> Positions { get; set; } = [];
+    public string TickerSymbol { get; private set; } = string.Empty;
+    public string Name { get; private set; } = string.Empty;
+    public AssetRisk Risk { get; private set; }
+    public ICollection<Quote> Quotes { get; private set; } = [];
+    public ICollection<Operation> Operations { get; private set; } = [];
+    public ICollection<Position> Positions { get; private set; } = [];
 
     protected Asset() { }
 
