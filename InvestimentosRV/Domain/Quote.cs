@@ -5,8 +5,8 @@ public class Quote : Entity
     public int AssetId { get; private set; }
     public decimal UnitPrice { get; private set; }
     public DateTime DateTime { get; private set; }
-
-    public Asset Asset { get; private set; } = default!;
+    private Asset _asset = default!;
+    public Asset Asset => _asset;
 
     protected Quote() { }
 
@@ -19,5 +19,10 @@ public class Quote : Entity
         AssetId = assetId;
         UnitPrice = unitPrice;
         DateTime = dateTime;
+    }
+
+    public void AddAsset(Asset asset)
+    {
+        _asset = asset;
     }
 }

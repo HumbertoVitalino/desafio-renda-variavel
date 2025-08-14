@@ -41,7 +41,7 @@ public class GetLatestQuote(
             return output;
         }
 
-        quote.Asset = asset;
+        quote.AddAsset(asset);
         output.AddResult(quote.MapToDto());
         return output;
     }
