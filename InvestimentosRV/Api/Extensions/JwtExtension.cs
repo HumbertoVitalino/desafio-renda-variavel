@@ -1,5 +1,4 @@
-﻿using Core.Boundaries.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -9,8 +8,6 @@ public static class JwtExtension
 {
     public static IServiceCollection AddJwt(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<JwtTokenProvider>();
-
         var secretKey = configuration["Jwt:Secret"];
         var key = Encoding.ASCII.GetBytes(secretKey);
 

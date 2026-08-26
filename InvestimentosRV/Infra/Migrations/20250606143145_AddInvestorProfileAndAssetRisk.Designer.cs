@@ -25,7 +25,7 @@ namespace Infra.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Domain.Asset", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.AssetModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,7 +66,7 @@ namespace Infra.Migrations
                     b.ToTable("ativos", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Operation", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.OperationModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,7 +121,7 @@ namespace Infra.Migrations
                     b.ToTable("operacoes", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Position", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.PositionModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -168,7 +168,7 @@ namespace Infra.Migrations
                     b.ToTable("posicoes", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Quote", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.QuoteModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -205,7 +205,7 @@ namespace Infra.Migrations
                     b.ToTable("cotacoes", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.User", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.UserModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -260,15 +260,15 @@ namespace Infra.Migrations
                     b.ToTable("usuarios", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Operation", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.OperationModel", b =>
                 {
-                    b.HasOne("Core.Domain.Asset", "Asset")
+                    b.HasOne("Infra.Repositories.Models.AssetModel", "Asset")
                         .WithMany("Operations")
                         .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.User", "User")
+                    b.HasOne("Infra.Repositories.Models.UserModel", "User")
                         .WithMany("Operations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -279,15 +279,15 @@ namespace Infra.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Position", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.PositionModel", b =>
                 {
-                    b.HasOne("Core.Domain.Asset", "Asset")
+                    b.HasOne("Infra.Repositories.Models.AssetModel", "Asset")
                         .WithMany("Positions")
                         .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.User", "User")
+                    b.HasOne("Infra.Repositories.Models.UserModel", "User")
                         .WithMany("Positions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -298,9 +298,9 @@ namespace Infra.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Domain.Quote", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.QuoteModel", b =>
                 {
-                    b.HasOne("Core.Domain.Asset", "Asset")
+                    b.HasOne("Infra.Repositories.Models.AssetModel", "Asset")
                         .WithMany("Quotes")
                         .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -309,7 +309,7 @@ namespace Infra.Migrations
                     b.Navigation("Asset");
                 });
 
-            modelBuilder.Entity("Core.Domain.Asset", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.AssetModel", b =>
                 {
                     b.Navigation("Operations");
 
@@ -318,7 +318,7 @@ namespace Infra.Migrations
                     b.Navigation("Quotes");
                 });
 
-            modelBuilder.Entity("Core.Domain.User", b =>
+            modelBuilder.Entity("Infra.Repositories.Models.UserModel", b =>
                 {
                     b.Navigation("Operations");
 

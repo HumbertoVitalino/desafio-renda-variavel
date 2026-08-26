@@ -1,16 +1,16 @@
-﻿using Api.Requests;
+using Api.Requests;
 using Api.Mappers;
 using AutoBogus;
-using Core.Domain;
-using Core.Mappers;
-using Core.UseCase.NewUserUseCase.Boundaries;
+using Domain.Entities;
+using Application.Mappers;
+using Application.UseCases.NewUserUseCase.Boundaries;
 using System.Security.Cryptography;
 
 namespace UnitTests.MappersTest;
 
 public class UserMapperTest
 {
-    [Fact(DisplayName = "MapToDomain > Success > Should Map NewUserInput to User")]
+    [Fact(DisplayName = "MapToDomain > Success > Should Map input data to User")]
     public void MapToDomain_GivenValidInput_ShouldMapToEntitySuccessfully()
     {
         // Arrange
@@ -19,7 +19,7 @@ public class UserMapperTest
         var brokerageRate = new Random().Next(1, 100);
 
         // Act
-        var result = input.MapToDomain(passwordHash, passwordSalt, brokerageRate);
+        var result = Application.Mappers.UserMapper.MapToDomain(input.Name, input.Email, passwordHash, passwordSalt, brokerageRate, input.Profile);
 
         // Assert
         Assert.NotNull(result);

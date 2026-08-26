@@ -29,6 +29,28 @@ public class Position : Entity
         ProfitAndLoss = 0;
     }
 
+    public static Position Reconstitute(
+        int id,
+        int userId,
+        int assetId,
+        int quantity,
+        decimal averagePrice,
+        decimal profitAndLoss,
+        DateTime createdAt,
+        DateTime updatedAt
+    )
+    {
+        var position = new Position(userId, assetId, quantity, averagePrice)
+        {
+            ProfitAndLoss = profitAndLoss
+        };
+        position.Id = id;
+        position.CreatedAt = createdAt;
+        position.UpdatedAt = updatedAt;
+
+        return position;
+    }
+
     public void ApplyBuy(int quantity, decimal unitPrice)
     {
         var totalValueOld = Quantity * AveragePrice;

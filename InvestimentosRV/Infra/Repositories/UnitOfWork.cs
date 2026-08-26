@@ -1,4 +1,4 @@
-﻿using Core.Interfaces;
+using Application.Interfaces.Repositories;
 
 namespace Infra.Repositories;
 

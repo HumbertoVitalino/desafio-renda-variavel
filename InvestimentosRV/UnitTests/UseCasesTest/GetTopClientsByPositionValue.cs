@@ -5,17 +5,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Domain;
-using Core.Interfaces;
-using Core.UseCase.GetTopClientsByPositionValueUseCase;
-using Core.UseCase.GetTopClientsByPositionValueUseCase.Boundaries;
-using Core.Dtos;
+using Domain.Entities;
+using Application.Interfaces.Repositories;
+using Application.UseCases.GetTopClientsByPositionValueUseCase;
+using Application.UseCases.GetTopClientsByPositionValueUseCase.Boundaries;
+using Application.DTOs;
 
 namespace UnitTests.UseCasesTest;
 
 public class GetTopClientsByPositionValueTest
 {
-    private readonly GetTopClientsByPositionValue _useCase;
+    private readonly GetTopClientsByPositionValueUseCase _useCase;
     private readonly Mock<IPositionRepository> _positionRepositoryMock;
     private readonly Mock<IQuoteRepository> _quoteRepositoryMock;
 
@@ -23,7 +23,7 @@ public class GetTopClientsByPositionValueTest
     {
         _positionRepositoryMock = new Mock<IPositionRepository>();
         _quoteRepositoryMock = new Mock<IQuoteRepository>();
-        _useCase = new GetTopClientsByPositionValue(_positionRepositoryMock.Object, _quoteRepositoryMock.Object);
+        _useCase = new GetTopClientsByPositionValueUseCase(_positionRepositoryMock.Object, _quoteRepositoryMock.Object);
     }
 
     [Fact(DisplayName = "GetTopClients > Success > Should calculate and sort clients by position value")]

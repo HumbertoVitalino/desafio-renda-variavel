@@ -1,6 +1,6 @@
-﻿using AutoBogus;
-using Core.Mappers;
-using Core.Domain;
+using AutoBogus;
+using Application.Mappers;
+using Domain.Entities;
 
 namespace UnitTests.MappersTest;
 

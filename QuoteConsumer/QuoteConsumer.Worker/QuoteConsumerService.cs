@@ -1,6 +1,6 @@
+using Application.Interfaces.Repositories;
 using Confluent.Kafka;
-using Core.Domain;
-using Core.Interfaces;
+using Domain.Entities;
 using QuoteConsumer.Worker.Dto;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -71,6 +71,7 @@ public class QuoteConsumerService : BackgroundService
                 foreach (var position in positionsToUpdate)
                 {
                     position.UpdateProfitAndLossWithNewQuote(newQuote.UnitPrice);
+                    positionRepository.Update(position);
                 }
 
                 await unitOfWork.CommitAsync(stoppingToken);

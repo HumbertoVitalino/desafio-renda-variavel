@@ -1,8 +1,8 @@
-﻿using AutoBogus;
-using Core.Mappers;
-using Core.Domain.Enums;
-using Core.UseCase.NewOperationUseCase.Boundaries;
-using Core.Domain;
+using AutoBogus;
+using Application.Mappers;
+using Domain.Enums;
+using Application.UseCases.NewOperationUseCase.Boundaries;
+using Domain.Entities;
 using Api.Requests;
 using Api.Mappers;
 
@@ -10,30 +10,27 @@ namespace UnitTests.MappersTest;
 
 public class OperationMapperTest
 {
-    [Fact(DisplayName = "MapToDomain > Success > Should Map NewOperationInput to Operation")]
+    [Fact(DisplayName = "MapToDomain > Success > Should Map input data to Operation")]
     public void MapToDomain_GivenValidInput_ShouldMapToEntitySuccessfully()
     {
-        // Arrange  
+        // Arrange
+        var userId = new Random().Next(1, 1000);
         var assetId = new Random().Next(1, 1000);
+        var quantity = new Random().Next(1, 100);
         var executionPrice = new Random().Next(1, 100);
+        var type = OperationType.Buy;
         var brokerageFee = new Random().Next(0, 10);
 
-        var input = new AutoFaker<NewOperationInput>()
-            .RuleFor(x => x.UserId, f => f.Random.Int(1, 1000))
-            .RuleFor(x => x.Quantity, f => f.Random.Int(1, 100))
-            .RuleFor(x => x.Type, f => f.PickRandom<OperationType>())
-            .Generate();
+        // Act
+        var result = Application.Mappers.OperationMapper.MapToDomain(userId, assetId, quantity, executionPrice, type, brokerageFee);
 
-        // Act  
-        var result = input.MapToDomain(assetId, executionPrice, brokerageFee);
-
-        // Assert  
+        // Assert
         Assert.NotNull(result);
-        Assert.Equal(input.UserId, result.UserId);
+        Assert.Equal(userId, result.UserId);
         Assert.Equal(assetId, result.AssetId);
-        Assert.Equal(input.Quantity, result.Quantity);
+        Assert.Equal(quantity, result.Quantity);
         Assert.Equal(executionPrice, result.UnitPrice);
-        Assert.Equal(input.Type, result.Type);
+        Assert.Equal(type, result.Type);
         Assert.Equal(brokerageFee, result.BrokerageFee);
         Assert.True((DateTime.UtcNow - result.DateTime).TotalSeconds < 5);
     }
@@ -41,14 +38,14 @@ public class OperationMapperTest
     [Fact(DisplayName = "MapToDto > Success > Should Map Operation to OperationDto")]
     public void MapToDto_GivenValidDomainObject_ShouldMapToDtoSuccessfully()
     {
-        // Arrange  
+        // Arrange
         var operation = new AutoFaker<Operation>()
             .Generate();
 
-        // Act  
+        // Act
         var result = operation.MapToDto();
 
-        // Assert   
+        // Assert
         Assert.NotNull(result);
         Assert.Equal(operation.Id, result.Id);
         Assert.Equal(operation.Asset.TickerSymbol, result.TickerSymbol);
@@ -59,7 +56,7 @@ public class OperationMapperTest
         Assert.Equal(operation.DateTime, result.DateTime);
     }
 
-    [Fact(DisplayName = "MapToInput > Success > Should Map NewOperationInput to NewOperationRequest")]
+    [Fact(DisplayName = "MapToInput > Success > Should Map NewOperationRequest to NewOperationInput")]
     public void MapToInput_GivenValidRequest_ShouldMapToInputSuccessfully()
     {
         // Arrange
@@ -76,4 +73,3 @@ public class OperationMapperTest
         Assert.Equal(request.Type, result.Type);
     }
 }
-

@@ -1,25 +1,25 @@
 ﻿using Moq;
 using AutoBogus;
-using Core.Domain;
-using Core.Domain.Enums;
-using Core.Interfaces;
-using Core.UseCase.NewOperationUseCase;
-using Core.UseCase.NewOperationUseCase.Boundaries;
+using Domain.Entities;
+using Domain.Enums;
+using Application.Interfaces.Repositories;
+using Application.UseCases.NewOperationUseCase;
+using Application.UseCases.NewOperationUseCase.Boundaries;
 using Microsoft.Extensions.Logging;
-using Core.Dtos;
+using Application.DTOs;
 
 namespace UnitTests.UseCasesTest;
 
 public class NewOperationTest
 {
-    private readonly NewOperation _useCase;
+    private readonly NewOperationUseCase _useCase;
     private readonly Mock<IAssetRepository> _assetRepositoryMock;
     private readonly Mock<IPositionRepository> _positionRepositoryMock;
     private readonly Mock<IOperationRepository> _operationRepositoryMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IQuoteRepository> _quoteRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<ILogger<NewOperation>> _loggerMock;
+    private readonly Mock<ILogger<NewOperationUseCase>> _loggerMock;
 
     public NewOperationTest()
     {
@@ -29,9 +29,9 @@ public class NewOperationTest
         _userRepositoryMock = new Mock<IUserRepository>();
         _quoteRepositoryMock = new Mock<IQuoteRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _loggerMock = new Mock<ILogger<NewOperation>>();
+        _loggerMock = new Mock<ILogger<NewOperationUseCase>>();
 
-        _useCase = new NewOperation(
+        _useCase = new NewOperationUseCase(
             _assetRepositoryMock.Object,
             _positionRepositoryMock.Object,
             _operationRepositoryMock.Object,

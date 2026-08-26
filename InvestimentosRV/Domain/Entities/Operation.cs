@@ -35,4 +35,25 @@ public class Operation : Entity
         BrokerageFee = brokerageFee;
         DateTime = dateTime;
     }
+
+    public static Operation Reconstitute(
+        int id,
+        int userId,
+        int assetId,
+        int quantity,
+        decimal unitPrice,
+        OperationType type,
+        decimal brokerageFee,
+        DateTime dateTime,
+        DateTime createdAt,
+        DateTime updatedAt
+    )
+    {
+        var operation = new Operation(userId, assetId, quantity, unitPrice, type, brokerageFee, dateTime);
+        operation.Id = id;
+        operation.CreatedAt = createdAt;
+        operation.UpdatedAt = updatedAt;
+
+        return operation;
+    }
 }
