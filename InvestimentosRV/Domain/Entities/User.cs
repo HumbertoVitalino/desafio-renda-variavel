@@ -33,6 +33,26 @@ public class User : Entity
         Profile = profile;
     }
 
+    public static User Reconstitute(
+        int id,
+        string name,
+        string email,
+        byte[] passwordHash,
+        byte[] passwordSalt,
+        decimal brokerageRate,
+        InvestorProfile profile,
+        DateTime createdAt,
+        DateTime updatedAt
+    )
+    {
+        var user = new User(name, email, passwordHash, passwordSalt, brokerageRate, profile);
+        user.Id = id;
+        user.CreatedAt = createdAt;
+        user.UpdatedAt = updatedAt;
+
+        return user;
+    }
+
     public bool IsSuitableFor(Asset asset)
     {
         if (Profile == InvestorProfile.Conservative && asset.Risk > AssetRisk.Low) return false;

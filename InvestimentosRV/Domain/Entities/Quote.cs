@@ -22,4 +22,21 @@ public class Quote : Entity
         UnitPrice = unitPrice;
         DateTime = dateTime;
     }
+
+    public static Quote Reconstitute(
+        int id,
+        int assetId,
+        decimal unitPrice,
+        DateTime dateTime,
+        DateTime createdAt,
+        DateTime updatedAt
+    )
+    {
+        var quote = new Quote(assetId, unitPrice, dateTime);
+        quote.Id = id;
+        quote.CreatedAt = createdAt;
+        quote.UpdatedAt = updatedAt;
+
+        return quote;
+    }
 }

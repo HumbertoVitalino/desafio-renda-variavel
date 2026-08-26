@@ -53,18 +53,18 @@ public class NewOperationUseCase(
                 throw new DomainException(PositionErrors.InsufficientQuantity);
 
             position.ApplySell(input.Quantity);
+            _positionRepository.Update(position);
         }
         else if (position is null)
         {
             position = PositionMapper.MapPositionToDomain(input.UserId, asset.Id, input.Quantity, currentUnitPrice);
+            await _positionRepository.CreateAsync(position, cancellationToken);
         }
         else
         {
             position.ApplyBuy(input.Quantity, currentUnitPrice);
+            _positionRepository.Update(position);
         }
-
-        if (position.Id == 0)
-            await _positionRepository.CreateAsync(position, cancellationToken);
 
         var operation = OperationMapper.MapToDomain(input.UserId, asset.Id, input.Quantity, currentUnitPrice, input.Type, calculatedBrokerageFee);
 

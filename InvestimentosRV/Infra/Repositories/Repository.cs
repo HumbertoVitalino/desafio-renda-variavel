@@ -1,37 +1,43 @@
-﻿using Core.Domain;
-using Core.Interfaces;
+using Application.Interfaces.Repositories;
+using Domain.Abstractions;
+using Infra.Repositories.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Repositories;
 
-public class Repository<T>(AppDbContext context) : IRepository<T> where T : Entity
+public abstract class Repository<TDomain, TModel>(AppDbContext context) : IRepository<TDomain>
+    where TDomain : Entity
+    where TModel : Model
 {
     protected readonly AppDbContext _context = context;
 
-    public async Task CreateAsync(T entity, CancellationToken cancellationToken) =>
-        await _context.Set<T>().AddAsync(entity, cancellationToken);
+    protected abstract TModel ToModel(TDomain entity);
+    protected abstract TDomain ToDomain(TModel model);
 
-    public void Delete(T entity)
+    public async Task CreateAsync(TDomain entity, CancellationToken cancellationToken) =>
+        await _context.Set<TModel>().AddAsync(ToModel(entity), cancellationToken);
+
+    public void Update(TDomain entity) =>
+        _context.Set<TModel>().Update(ToModel(entity));
+
+    public void Delete(TDomain entity) =>
+        _context.Set<TModel>().Remove(ToModel(entity));
+
+    public async Task<TDomain?> GetAsync(int id, CancellationToken cancellationToken)
     {
-        _context.Remove(entity);
+        var model = await _context.Set<TModel>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+
+        return model is null ? null : ToDomain(model);
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<TDomain>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _context.Set<T>()
+        var models = await _context.Set<TModel>()
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-    }
 
-    public async Task<T?> GetAsync(int id, CancellationToken cancellationToken)
-    {
-        return await _context.Set<T>()
-            .FindAsync([id], cancellationToken);
-    }
-
-    public void Update(T entity)
-    {
-        entity.UpdatedAt = DateTime.UtcNow;
-        _context.Update(entity);
+        return models.Select(ToDomain);
     }
 }

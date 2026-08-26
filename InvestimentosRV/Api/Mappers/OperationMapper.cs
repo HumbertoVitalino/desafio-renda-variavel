@@ -1,5 +1,5 @@
 ﻿using Api.Requests;
-using Core.UseCase.NewOperationUseCase.Boundaries;
+using Application.UseCases.NewOperationUseCase.Boundaries;
 
 namespace Api.Mappers;
 

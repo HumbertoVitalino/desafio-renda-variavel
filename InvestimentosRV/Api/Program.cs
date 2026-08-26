@@ -1,5 +1,7 @@
+using Api.Endpoints;
 using Api.Extensions;
-using Core.IoC;
+using Api.Handlers;
+using Application.IoC;
 using Infra.IoC;
 using Serilog;
 
@@ -21,13 +23,15 @@ builder.Services.AddCors(options =>
 
 
 builder.AddSerilogApi();
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 
 builder.Services.AddJwt(configuration);
-builder.Services.AddMediatr(configuration);
+builder.Services.AddApplication();
 builder.Services.AddInfra(configuration);
+
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<DomainExceptionHandler>();
 
 var app = builder.Build();
 
@@ -40,10 +44,12 @@ app.UseSerilogRequestLogging();
 
 app.UseCors(MyAllowSpecificOrigins);
 
+app.UseExceptionHandler();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapMinimalApisV1();
 
 app.Run();

@@ -1,36 +1,33 @@
 ﻿using Xunit;
 using Moq;
 using AutoBogus;
-using Core.UseCase.GetUserAssetPositionUseCase;
-using Core.Interfaces;
+using Application.UseCases.GetUserAssetPositionUseCase;
+using Application.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
-using Core.UseCase.GetUserAssetPositionUseCase.Boundaries;
+using Application.UseCases.GetUserAssetPositionUseCase.Boundaries;
 using System.Threading.Tasks;
 using System.Threading;
-using Core.Domain;
-using Core.Dtos;
+using Domain.Entities;
+using Application.DTOs;
 
 namespace UnitTests.UseCasesTest;
 
 public class GetUserAssetPositionTest
 {
-    private readonly GetUserAssetPosition _useCase;
+    private readonly GetUserAssetPositionUseCase _useCase;
     private readonly Mock<IAssetRepository> _assetRepositoryMock;
     private readonly Mock<IPositionRepository> _positionRepositoryMock;
-    private readonly Mock<IQuoteRepository> _quoteRepositoryMock;
-    private readonly Mock<ILogger<GetUserAssetPosition>> _loggerMock;
+    private readonly Mock<ILogger<GetUserAssetPositionUseCase>> _loggerMock;
 
     public GetUserAssetPositionTest()
     {
         _assetRepositoryMock = new Mock<IAssetRepository>();
         _positionRepositoryMock = new Mock<IPositionRepository>();
-        _quoteRepositoryMock = new Mock<IQuoteRepository>();
-        _loggerMock = new Mock<ILogger<GetUserAssetPosition>>();
+        _loggerMock = new Mock<ILogger<GetUserAssetPositionUseCase>>();
 
-        _useCase = new GetUserAssetPosition(
+        _useCase = new GetUserAssetPositionUseCase(
             _assetRepositoryMock.Object,
             _positionRepositoryMock.Object,
-            _quoteRepositoryMock.Object,
             _loggerMock.Object
         );
     }

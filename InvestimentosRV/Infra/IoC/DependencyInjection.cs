@@ -1,5 +1,7 @@
-﻿using Core.Interfaces;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Services;
 using Infra.Repositories;
+using Infra.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +28,7 @@ public static class DependencyInjection
         serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
         serviceCollection.AddScoped<IUserRepository, UserRepository>();
         serviceCollection.AddScoped<IPasswordService, PasswordService>();
+        serviceCollection.AddScoped<ITokenProvider, JwtTokenProvider>();
         serviceCollection.AddScoped<IQuoteRepository, QuoteRepository>();
         serviceCollection.AddScoped<IPositionRepository, PositionRepository>();
         serviceCollection.AddScoped<IAssetRepository, AssetRepository>();

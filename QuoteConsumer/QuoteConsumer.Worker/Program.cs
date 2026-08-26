@@ -1,21 +1,9 @@
-using Core.Interfaces;
-using Infra.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Infra.IoC;
 
 Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddDbContext<AppDbContext>(options =>
-        {
-            var connectionString = hostContext.Configuration.GetConnectionString("DefaultConnection");
-            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        });
-
-        services.AddScoped<IAssetRepository, AssetRepository>();
-        services.AddScoped<IQuoteRepository, QuoteRepository>();
-        services.AddScoped<IPositionRepository, PositionRepository>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+        services.AddInfra(hostContext.Configuration);
         services.AddHostedService<QuoteConsumerService>();
     })
     .Build()

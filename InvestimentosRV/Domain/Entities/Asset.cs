@@ -24,4 +24,21 @@ public class Asset : Entity
         Name = name;
         Risk = risk;
     }
+
+    public static Asset Reconstitute(
+        int id,
+        string tickerSymbol,
+        string name,
+        AssetRisk risk,
+        DateTime createdAt,
+        DateTime updatedAt
+    )
+    {
+        var asset = new Asset(tickerSymbol, name, risk);
+        asset.Id = id;
+        asset.CreatedAt = createdAt;
+        asset.UpdatedAt = updatedAt;
+
+        return asset;
+    }
 }

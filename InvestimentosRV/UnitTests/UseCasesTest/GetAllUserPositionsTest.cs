@@ -1,28 +1,28 @@
 ﻿using Moq;
 using AutoBogus;
-using Core.Domain;
-using Core.Interfaces;
-using Core.UseCase.GetAllUserPositionsUseCase;
-using Core.UseCase.GetAllUserPositionsUseCase.Boundaries;
+using Domain.Entities;
+using Application.Interfaces.Repositories;
+using Application.UseCases.GetAllUserPositionsUseCase;
+using Application.UseCases.GetAllUserPositionsUseCase.Boundaries;
 using Microsoft.Extensions.Logging;
-using Core.Dtos;
+using Application.DTOs;
 
 namespace UnitTests.UseCasesTest;
 
 public class GetAllUserPositionsTest
 {
-    private readonly GetAllUserPositions _useCase;
+    private readonly GetAllUserPositionsUseCase _useCase;
     private readonly Mock<IPositionRepository> _positionRepositoryMock;
-    private readonly Mock<ILogger<GetAllUserPositions>> _loggerMock;
+    private readonly Mock<ILogger<GetAllUserPositionsUseCase>> _loggerMock;
 
     public GetAllUserPositionsTest()
     {
         _positionRepositoryMock = new Mock<IPositionRepository>();
-        _loggerMock = new Mock<ILogger<GetAllUserPositions>>();
-        _useCase = new GetAllUserPositions(_positionRepositoryMock.Object, _loggerMock.Object);
+        _loggerMock = new Mock<ILogger<GetAllUserPositionsUseCase>>();
+        _useCase = new GetAllUserPositionsUseCase(_positionRepositoryMock.Object, _loggerMock.Object);
     }
 
-    [Fact(DisplayName = "GetAllUserPositions > Error > Should return error when no positions are found")]
+    [Fact(DisplayName = "GetAllUserPositionsUseCase > Error > Should return error when no positions are found")]
     public async Task Handle_ShouldReturnError_WhenNoPositionsFound()
     {
         // Arrange  
@@ -38,7 +38,7 @@ public class GetAllUserPositionsTest
         Assert.Contains($"No positions found for user with ID {input.UserId}.", result.ErrorMessages);
     }
 
-    [Fact(DisplayName = "GetAllUserPositions > Success > Should return list of position DTOs")]
+    [Fact(DisplayName = "GetAllUserPositionsUseCase > Success > Should return list of position DTOs")]
     public async Task Handle_ShouldReturnPositionDtoList_WhenPositionsAreFound()
     {
         // Arrange  

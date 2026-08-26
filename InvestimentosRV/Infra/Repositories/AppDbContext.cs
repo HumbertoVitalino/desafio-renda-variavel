@@ -1,21 +1,21 @@
-﻿using Core.Domain;
+using Infra.Repositories.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Repositories;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<User> Users { get; set; } = default!;
-    public DbSet<Asset> Assets { get; set; } = default!;
-    public DbSet<Operation> Operations { get; set; } = default!;
-    public DbSet<Position> Positions { get; set; } = default!;
-    public DbSet<Quote> Quotes { get; set; } = default!;
+    public DbSet<UserModel> Users { get; set; } = default!;
+    public DbSet<AssetModel> Assets { get; set; } = default!;
+    public DbSet<OperationModel> Operations { get; set; } = default!;
+    public DbSet<PositionModel> Positions { get; set; } = default!;
+    public DbSet<QuoteModel> Quotes { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<User>(entity =>
+        modelBuilder.Entity<UserModel>(entity =>
         {
             entity.ToTable("usuarios");
 
@@ -37,7 +37,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasMany(e => e.Positions).WithOne(p => p.User).HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<Asset>(entity =>
+        modelBuilder.Entity<AssetModel>(entity =>
         {
             entity.ToTable("ativos");
 
@@ -57,7 +57,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasMany(e => e.Positions).WithOne(p => p.Asset).HasForeignKey(p => p.AssetId).OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<Operation>(entity =>
+        modelBuilder.Entity<OperationModel>(entity =>
         {
             entity.ToTable("operacoes");
 
@@ -77,7 +77,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasIndex(e => new { e.UserId, e.AssetId, e.DateTime }).HasDatabaseName("ix_operacoes_usuario_ativo_data");
         });
 
-        modelBuilder.Entity<Quote>(entity =>
+        modelBuilder.Entity<QuoteModel>(entity =>
         {
             entity.ToTable("cotacoes");
 
@@ -93,7 +93,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasIndex(e => new { e.AssetId, e.DateTime }).IsUnique();
         });
 
-        modelBuilder.Entity<Position>(entity =>
+        modelBuilder.Entity<PositionModel>(entity =>
         {
             entity.ToTable("posicoes");
 

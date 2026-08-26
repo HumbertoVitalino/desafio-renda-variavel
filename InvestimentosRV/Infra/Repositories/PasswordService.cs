@@ -1,4 +1,4 @@
-﻿using Core.Interfaces;
+using Application.Interfaces.Services;
 using System.Security.Cryptography;
 
 namespace Infra.Repositories;

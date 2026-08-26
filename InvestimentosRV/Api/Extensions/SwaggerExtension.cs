@@ -1,4 +1,4 @@
-﻿using Core.Boundaries.Jwt;
+﻿using Api.Swagger;
 using Microsoft.OpenApi.Models;
 
 namespace Api.Extensions;

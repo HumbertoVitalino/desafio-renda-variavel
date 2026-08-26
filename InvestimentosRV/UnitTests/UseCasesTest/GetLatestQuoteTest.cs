@@ -1,30 +1,30 @@
 ﻿using Moq;
 using AutoBogus;
-using Core.Domain;
-using Core.Interfaces;
-using Core.UseCase.GetLatestQuoteUseCase;
-using Core.UseCase.GetLatestQuoteUseCase.Boundaries;
+using Domain.Entities;
+using Application.Interfaces.Repositories;
+using Application.UseCases.GetLatestQuoteUseCase;
+using Application.UseCases.GetLatestQuoteUseCase.Boundaries;
 using Microsoft.Extensions.Logging;
-using Core.Dtos;
+using Application.DTOs;
 
 namespace UnitTests.UseCasesTest;
 
 public class GetLatestQuoteTest
 {
-    private readonly GetLatestQuote _useCase;
+    private readonly GetLatestQuoteUseCase _useCase;
     private readonly Mock<IQuoteRepository> _quoteRepositoryMock;
     private readonly Mock<IAssetRepository> _assetRepositoryMock;
-    private readonly Mock<ILogger<GetLatestQuote>> _loggerMock;
+    private readonly Mock<ILogger<GetLatestQuoteUseCase>> _loggerMock;
 
     public GetLatestQuoteTest()
     {
         _quoteRepositoryMock = new Mock<IQuoteRepository>();
         _assetRepositoryMock = new Mock<IAssetRepository>();
-        _loggerMock = new Mock<ILogger<GetLatestQuote>>();
-        _useCase = new GetLatestQuote(_quoteRepositoryMock.Object, _assetRepositoryMock.Object, _loggerMock.Object);
+        _loggerMock = new Mock<ILogger<GetLatestQuoteUseCase>>();
+        _useCase = new GetLatestQuoteUseCase(_quoteRepositoryMock.Object, _assetRepositoryMock.Object, _loggerMock.Object);
     }
 
-    [Fact(DisplayName = "GetLatestQuote > Error > Should return error when asset is not found")]
+    [Fact(DisplayName = "GetLatestQuoteUseCase > Error > Should return error when asset is not found")]
     public async Task Handle_ShouldReturnError_WhenAssetNotFound()
     {
         // Arrange  
@@ -41,7 +41,7 @@ public class GetLatestQuoteTest
         _quoteRepositoryMock.Verify(r => r.GetLatestQuoteByAssetIdAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
-    [Fact(DisplayName = "GetLatestQuote > Error > Should return error when quote is not found")]
+    [Fact(DisplayName = "GetLatestQuoteUseCase > Error > Should return error when quote is not found")]
     public async Task Handle_ShouldReturnError_WhenQuoteNotFound()
     {
         // Arrange  
@@ -61,7 +61,7 @@ public class GetLatestQuoteTest
         Assert.Contains("Quote not found", result.ErrorMessages);
     }
 
-    [Fact(DisplayName = "GetLatestQuote > Success > Should return quote DTO")]
+    [Fact(DisplayName = "GetLatestQuoteUseCase > Success > Should return quote DTO")]
     public async Task Handle_ShouldReturnQuoteDto_WhenFound()
     {
         // Arrange  

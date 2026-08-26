@@ -1,46 +1,42 @@
-﻿using AutoBogus;
-using Core.Domain;
-using Core.Mappers;
-using Core.UseCase.NewOperationUseCase.Boundaries;
+using AutoBogus;
+using Domain.Entities;
+using Application.Mappers;
 
 namespace UnitTests.MappersTest;
 
 public class PositionMapperTest
 {
-    [Fact(DisplayName = "MapToDomain > Success > Should Map NewOperationInput to Position")]
-    public void MapToDomain_GivenValidInput_ShouldMapToEntitySuccessfully()
+    [Fact(DisplayName = "MapPositionToDomain > Success > Should Map input data to Position")]
+    public void MapPositionToDomain_GivenValidInput_ShouldMapToEntitySuccessfully()
     {
-        // Arrange  
+        // Arrange
+        var userId = new Random().Next(1, 1000);
         var assetId = new Random().Next(1, 1000);
+        var quantity = new Random().Next(1, 100);
         var executionPrice = new Random().Next(1, 100);
 
-        var input = new AutoFaker<NewOperationInput>()
-            .RuleFor(x => x.UserId, f => f.Random.Int(1, 1000))
-            .RuleFor(x => x.Quantity, f => f.Random.Int(1, 100))
-            .Generate();
+        // Act
+        var result = PositionMapper.MapPositionToDomain(userId, assetId, quantity, executionPrice);
 
-        // Act  
-        var result = input.MapPositionToDomain(assetId, executionPrice);
-
-        // Assert  
+        // Assert
         Assert.NotNull(result);
-        Assert.Equal(input.UserId, result.UserId);
+        Assert.Equal(userId, result.UserId);
         Assert.Equal(assetId, result.AssetId);
-        Assert.Equal(input.Quantity, result.Quantity);
+        Assert.Equal(quantity, result.Quantity);
         Assert.Equal(executionPrice, result.AveragePrice);
     }
 
     [Fact(DisplayName = "MapToDto > Success > Should Map Position to PositionDto")]
     public void MapToDto_GivenValidDomainObject_ShouldMapToDtoSuccessfully()
     {
-        // Arrange  
+        // Arrange
         var position = new AutoFaker<Position>()
             .Generate();
 
-        // Act  
+        // Act
         var result = position.MapToDto();
 
-        // Assert   
+        // Assert
         Assert.NotNull(result);
         Assert.Equal(position.Asset.TickerSymbol, result.TickerSymbol);
         Assert.Equal(position.Asset.Name, result.AssetName);
@@ -52,14 +48,14 @@ public class PositionMapperTest
     [Fact(DisplayName = "MapToDto > Success > Should Map IEnumerable<Position> to IEnumerable<PositionDto>")]
     public void MapToDto_GivenValidDomainCollection_ShouldMapToDtoCollectionSuccessfully()
     {
-        // Arrange  
+        // Arrange
         var positions = new AutoFaker<Position>()
             .Generate(5);
 
-        // Act  
+        // Act
         var result = positions.MapToDto();
 
-        // Assert   
+        // Assert
         Assert.NotNull(result);
         Assert.Equal(5, result.Count());
 

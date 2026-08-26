@@ -1,6 +1,6 @@
 ﻿using Api.Requests;
-using Core.UseCase.LoginUserUseCase.Boundaries;
-using Core.UseCase.NewUserUseCase.Boundaries;
+using Application.UseCases.LoginUserUseCase.Boundaries;
+using Application.UseCases.NewUserUseCase.Boundaries;
 
 namespace Api.Mappers;
 
